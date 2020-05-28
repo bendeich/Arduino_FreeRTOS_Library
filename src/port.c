@@ -31,7 +31,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
-#include <avr/wdt.h>
+
 
 #include "Arduino_FreeRTOS.h"
 #include "task.h"
@@ -43,7 +43,7 @@
 /* Start tasks with interrupts enabled. */
 #define portFLAGS_INT_ENABLED           ( (StackType_t) 0x80 )
 
-#define    portSCHEDULER_ISR            WDT_vect
+#define    portSCHEDULER_ISR            TIMER1_COMPA_vect
 
 /*-----------------------------------------------------------*/
 
@@ -478,7 +478,7 @@ void vPortEndScheduler( void )
     /* It is unlikely that the AVR port will get stopped.  If required simply
     disable the tick interrupt here. */
 
-        wdt_disable();      /* disable Watchdog Timer */
+        TIMSK1 &= ~(1 << OCIE1A);
 }
 /*-----------------------------------------------------------*/
 
@@ -538,11 +538,15 @@ void vPortYieldFromTick( void )
  */
 void prvSetupTimerInterrupt( void )
 {
-    /* reset watchdog */
-    wdt_reset();
-
-    /* set up WDT Interrupt (rather than the WDT Reset). */
-    wdt_interrupt_enable( portUSE_WDTO );
+  
+    /* set up Timer1 in Output Compare Mode */
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TCNT1 = 0;                
+    OCR1A = 625;            // Output Compare Register  
+    TCCR1B |= (1 << WGM12);  //CTC-Mode (Waveform Generation Mode)
+    TCCR1B |= (1 << CS12);    // CS12=256  64=CS11|C10 prescaler
+    TIMSK1 |= (1 << OCIE1A);  // Timer Compare Interrupt 
 }
 /*-----------------------------------------------------------*/
 
