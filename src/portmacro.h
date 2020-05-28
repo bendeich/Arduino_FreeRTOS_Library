@@ -85,11 +85,8 @@ typedef uint8_t                     UBaseType_t;
 #define portSTACK_GROWTH            ( -1 )
 
 /* Timing for the scheduler.
- * Watchdog Timer is 128kHz nominal,
- * but 120 kHz at 5V DC and 25 degrees is actually more accurate,
- * from data sheet.
  */
-#define portTICK_PERIOD_MS          ( (TickType_t) _BV( portUSE_WDTO + 4 ) )
+#define portTICK_PERIOD_MS          ( (TickType_t) 10 )
 
 #define portBYTE_ALIGNMENT          1
 #define portNOP()                   __asm__ __volatile__ ( "nop" );
